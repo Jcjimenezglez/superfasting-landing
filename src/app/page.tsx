@@ -1,65 +1,159 @@
-import Image from "next/image";
+"use client"
+
+import { useEffect, useState } from "react"
+import Link from "next/link"
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Logo } from "@/components/logo"
+import { WaitlistForm } from "@/components/waitlist-form"
+import { ChevronDown, Users } from "lucide-react"
+
+type Locale = "es" | "en"
+
+const SOCIAL_PROOF_BASE = 247
+const STORAGE_KEY = "superfasting_social_proof"
+
+function getStoredCount(): number {
+  if (typeof window === "undefined") return SOCIAL_PROOF_BASE
+  const stored = localStorage.getItem(STORAGE_KEY)
+  if (!stored) return SOCIAL_PROOF_BASE
+  const n = parseInt(stored, 10)
+  return !Number.isNaN(n) && n >= SOCIAL_PROOF_BASE ? n : SOCIAL_PROOF_BASE
+}
+
+const copy = {
+  es: {
+    skip: "Ir al contenido principal",
+    langLabel: "Idioma",
+    heroTitleBefore: "Ayuno intermitente para ",
+    heroTitleHighlight: "bajar de peso.",
+    heroSubtitle: "Un asistente personal que te ayuda a mantener tu ayuno, registrar comidas y seguir adelante—todo en Telegram.",
+    ctaLabel: "Unirme al waitlist",
+    socialProof: "personas se unieron",
+    timing: "Lanzando en marzo 2026",
+    footer: "Superfasting.live",
+  },
+  en: {
+    skip: "Skip to main content",
+    langLabel: "Language",
+    heroTitleBefore: "Intermittent fasting for ",
+    heroTitleHighlight: "weight loss.",
+    heroSubtitle: "A personal assistant that helps you stick to your fast, track meals, and stay on track—all in Telegram.",
+    ctaLabel: "Join waitlist",
+    socialProof: "people joined",
+    timing: "Launching March 2026",
+    footer: "Superfasting.live",
+  },
+} as const
+
+function randomIncrement() {
+  return Math.floor(Math.random() * 5) + 1
+}
 
 export default function Home() {
+  const [lang, setLang] = useState<Locale>("en")
+  const [socialProofCount, setSocialProofCount] = useState(SOCIAL_PROOF_BASE)
+  const t = copy[lang]
+
+  useEffect(() => {
+    setSocialProofCount(getStoredCount())
+  }, [])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSocialProofCount((c) => {
+        const next = c + randomIncrement()
+        localStorage.setItem(STORAGE_KEY, String(next))
+        return next
+      })
+    }, 60_000)
+    return () => clearInterval(interval)
+  }, [])
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="flex min-h-screen flex-col overflow-y-auto bg-background">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-foreground focus:px-3 focus:py-2 focus:text-background"
+      >
+        {t.skip}
+      </a>
+
+      <header className="shrink-0 border-b border-border/40 bg-background/80 backdrop-blur-sm">
+        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between sm:h-16">
+          <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight" style={{ fontFamily: "var(--font-poppins)" }}>
+            <Logo size={28} className="text-primary" />
+            <span>Superfasting</span>
+          </Link>
+          <div className="flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                aria-label={t.langLabel}
+                className="flex items-center gap-1 rounded-md px-2 py-1.5 text-sm text-muted-foreground outline-none hover:text-foreground"
+              >
+                {lang === "en" ? "EN" : "ES"}
+                <ChevronDown className="size-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setLang("en")}>EN</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLang("es")}>ES</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+      </header>
+
+      <main id="main-content" className="flex min-h-0 flex-1 flex-col justify-center px-4 py-6 sm:px-6 sm:py-8">
+        <div className="mx-auto w-full max-w-5xl">
+          <section className="flex flex-col justify-center space-y-3 sm:space-y-5">
+            <h1
+              className="font-bold leading-[1.05] tracking-tight"
+              style={{
+                fontFamily: "var(--font-poppins)",
+                fontSize: "clamp(1.75rem, 6vw + 1.5rem, 6rem)",
+              }}
+            >
+              {t.heroTitleBefore}
+              <span
+                className="inline-block bg-[rgba(0,136,204,0.3)] px-1.5 py-0.5"
+                style={{ boxDecorationBreak: "clone", transform: "skewX(-2deg)" }}
+              >
+                {t.heroTitleHighlight}
+              </span>
+            </h1>
+            <p className="max-w-xl text-base text-muted-foreground sm:text-lg">
+              {t.heroSubtitle}
+            </p>
+            <div id="waitlist" className="pt-2 sm:pt-4">
+            <WaitlistForm
+              lang={lang}
+              buttonLabel={t.ctaLabel}
+              emailPlaceholder={lang === "es" ? "tuemail@correo.com" : "you@email.com"}
+              className="max-w-md"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground sm:mt-6">
+              <span className="flex items-center gap-2">
+                <Users className="size-4 shrink-0" />
+                <strong className="font-medium text-foreground">{socialProofCount.toLocaleString()}</strong>{" "}
+                {t.socialProof}
+              </span>
+              <span className="text-muted-foreground/90">{t.timing}</span>
+            </div>
+          </div>
+          </section>
         </div>
       </main>
+
+      <footer className="shrink-0 border-t border-border/40 py-4 sm:py-6">
+        <div className="mx-auto max-w-5xl px-4 text-center text-sm text-muted-foreground sm:px-6">
+          {t.footer}
+        </div>
+      </footer>
     </div>
-  );
+  )
 }

@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Superfasting Landing
 
-## Getting Started
+Landing page for `superfasting.live`, built with Next.js + shadcn/ui.
 
-First, run the development server:
+## Main Sections
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+The page includes:
+
+1. Hero
+2. Problem-awareness
+3. Story
+4. How it works
+5. Features + premium details
+6. Free vs Premium comparison table
+7. Testimonial
+8. FAQ
+9. Final CTA
+
+## Waitlist Storage
+
+Waitlist form submits to:
+
+- `POST /api/waitlist`
+
+Emails are stored in Postgres (Supabase) table:
+
+- `waitlist_emails`
+
+The table is auto-created on first insert by `src/lib/waitlist-db.ts`.
+
+## Environment Variables
+
+Create `.env.local` from `.env.example` and set:
+
+- `DATABASE_URL`
+
+Example format (Supabase pooler):
+
+```env
+DATABASE_URL=postgresql://postgres.YOUR_PROJECT_REF:YOUR_SUPABASE_DB_PASSWORD@aws-0-us-west-2.pooler.supabase.com:6543/postgres?sslmode=require
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Local Development
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Then open:
 
-## Learn More
+- `http://localhost:3000`
 
-To learn more about Next.js, take a look at the following resources:
+## Quality Checks
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run lint
+npm run build
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

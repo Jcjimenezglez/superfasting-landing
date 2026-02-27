@@ -1,19 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Link from "next/link"
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Logo } from "@/components/logo"
 import { WaitlistForm } from "@/components/waitlist-form"
-import { ChevronDown } from "lucide-react"
 
-type Locale = "es" | "en"
 type MockupMessage = {
   from: "user" | "bot"
   text: React.ReactNode
@@ -30,48 +21,11 @@ function getStoredCount(): number {
   return !Number.isNaN(n) && n >= SOCIAL_PROOF_BASE ? n : SOCIAL_PROOF_BASE
 }
 
-const copy = {
-  es: {
-    skip: "Ir al contenido principal",
-    langLabel: "Idioma",
-    heroTitleBefore: "Ayuno intermitente para ",
-    heroTitleHighlight: "bajar de peso.",
-    heroSubtitle: "Un asistente personal que te ayuda a mantener tu ayuno, registrar comidas y seguir adelante—todo en Telegram.",
-    ctaLabel: "Unirme al waitlist",
-    socialProof: "personas se unieron",
-    timing: "Lanzando en marzo 2026",
-    mockupBotName: "Superfasting bot",
-    mockupStatus: "Online ahora",
-    mockupToday: "Hoy",
-    mockupInputPlaceholder: "Mensaje",
-    mockupMessages: [
-      { from: "bot", text: <>Hey 👋 soy tu asistente de <b>ayuno intermitente</b>. Cuéntame tu peso actual, tu meta, y yo me encargo del resto. ¿En qué te ayudo?</> },
-      { from: "user", text: <>Peso 92 kg y quiero llegar a 78 kg</> },
-      { from: "bot", text: <>¡Genial! Aquí va tu plan personalizado:{"\n\n"}🕐 <b>Protocolo 16:8</b> — 8 horas para comer, 16 de ayuno{"\n"}⚖️ <b>Meta: 92 → 78 kg</b>{"\n"}📸 Envíame foto de tu pesa al pesarte y de tu comida — te digo si vas bien y qué ajustar{"\n"}💬 Pregúntame <b>&quot;status&quot;</b> cuando quieras ver tu progreso{"\n\n"}Cuando estés listo dime <b>Start</b> y empezamos 🚀</> },
-    ] as MockupMessage[],
-    footer: "Superfasting.live",
-  },
-  en: {
-    skip: "Skip to main content",
-    langLabel: "Language",
-    heroTitleBefore: "Intermittent fasting for ",
-    heroTitleHighlight: "weight loss.",
-    heroSubtitle: "A personal assistant that helps you stick to your fast, track meals, and stay on track—all in Telegram.",
-    ctaLabel: "Join waitlist",
-    socialProof: "people joined",
-    timing: "Launching March 2026",
-    mockupBotName: "Superfasting bot",
-    mockupStatus: "Online now",
-    mockupToday: "Today",
-    mockupInputPlaceholder: "Message",
-    mockupMessages: [
-      { from: "bot", text: <>Hey 👋 I&apos;m your <b>intermittent fasting</b> assistant. Tell me your current weight, your goal, and I&apos;ll take it from there. How can I help?</> },
-      { from: "user", text: <>I weigh 203 lb and I want to get to{"\n"}172&nbsp;lb</> },
-      { from: "bot", text: <>Love it! Here&apos;s your personalized plan:{"\n\n"}🕐 <b>16:8 protocol</b> — 8 hours to eat, 16 fasting{"\n"}⚖️ <b>Goal: 203 → 172 lb</b>{"\n"}📸 Send me a photo of your scale when you weigh in and your meals — I&apos;ll tell you if you&apos;re on track and what to tweak{"\n"}💬 Just ask me <b>&quot;status&quot;</b> anytime to check your progress{"\n\n"}Whenever you&apos;re ready just say <b>Start</b> and we&apos;ll begin 🚀</> },
-    ] as MockupMessage[],
-    footer: "Superfasting.live",
-  },
-} as const
+const mockupMessages: MockupMessage[] = [
+  { from: "bot", text: <>Hey 👋 I&apos;m your <b>intermittent fasting</b> assistant. Tell me your current weight, your goal, and I&apos;ll take it from there. How can I help?</> },
+  { from: "user", text: <>I weigh 203 lb and I want to get to{"\n"}172&nbsp;lb</> },
+  { from: "bot", text: <>Love it! Here&apos;s your personalized plan:{"\n\n"}🕐 <b>16:8 protocol</b> — 8 hours to eat, 16 fasting{"\n"}⚖️ <b>Goal: 203 → 172 lb</b>{"\n"}📸 Send me a photo of your scale when you weigh in and your meals — I&apos;ll tell you if you&apos;re on track and what to tweak{"\n"}💬 Just ask me <b>&quot;status&quot;</b> anytime to check your progress{"\n\n"}Whenever you&apos;re ready just say <b>Start</b> and we&apos;ll begin 🚀</> },
+]
 
 function randomIncrement() {
   return Math.floor(Math.random() * 5) + 1
@@ -87,9 +41,7 @@ const socialProofAvatars = [
 ] as const
 
 export default function Home() {
-  const [lang, setLang] = useState<Locale>("en")
   const [socialProofCount, setSocialProofCount] = useState(SOCIAL_PROOF_BASE)
-  const t = copy[lang]
 
   useEffect(() => {
     setSocialProofCount(getStoredCount())
@@ -108,60 +60,32 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col overflow-y-auto bg-background">
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-foreground focus:px-3 focus:py-2 focus:text-background"
-      >
-        {t.skip}
-      </a>
-
-      <header className="shrink-0 border-b border-border/40 bg-background/80 backdrop-blur-sm">
-        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:h-16 sm:px-6 lg:px-0">
-          <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight" style={{ fontFamily: "var(--font-poppins)" }}>
-            <Logo size={28} className="text-primary" />
-            <span>Superfasting</span>
-          </Link>
-          <div className="flex items-center gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                aria-label={t.langLabel}
-                className="flex items-center gap-1 rounded-md px-2 py-1.5 text-sm text-muted-foreground outline-none hover:text-foreground"
-              >
-                {lang === "en" ? "EN" : "ES"}
-                <ChevronDown className="size-4" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setLang("en")}>EN</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setLang("es")}>ES</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-      </header>
-
-      <main id="main-content" className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 py-6 sm:px-6 sm:py-8 lg:py-6">
+      <main className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 py-6 sm:px-6 sm:py-8 lg:py-6">
         <div className="mx-auto w-full max-w-5xl">
           <section className="grid items-center justify-items-center gap-6 sm:gap-8 lg:gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(300px,440px)]">
             <div className="w-full max-w-xl space-y-3 text-center sm:space-y-5 lg:text-left">
+              <div className="flex items-center justify-center gap-2 lg:justify-start">
+                <Logo size={28} className="text-primary" />
+                <span className="text-lg font-bold tracking-tight" style={{ fontFamily: "var(--font-poppins)" }}>Superfasting</span>
+              </div>
               <h1
                 className="mx-auto max-w-[13ch] font-bold leading-[1.15] tracking-tight text-[clamp(2.35rem,8vw+1.2rem,3.5rem)] sm:text-[clamp(2.75rem,9vw+1.5rem,4.5rem)] lg:mx-0 lg:text-[clamp(2.5rem,5vw+0.75rem,5.25rem)]"
                 style={{
                   fontFamily: "var(--font-poppins)",
                 }}
               >
-                {t.heroTitleBefore}
+                Intermittent fasting for{" "}
                 <span className="text-primary">
-                  {t.heroTitleHighlight}
+                  weight loss.
                 </span>
               </h1>
               <p className="mx-auto max-w-xl text-base text-muted-foreground sm:text-lg lg:mx-0">
-                {t.heroSubtitle}
+                A personal assistant that helps you stick to your fast, track meals, and stay on track—all in Telegram.
               </p>
               <div id="waitlist" className="mx-auto pt-2 sm:pt-4 lg:mx-0">
                 <WaitlistForm
-                  lang={lang}
-                  buttonLabel={t.ctaLabel}
-                  emailPlaceholder={lang === "es" ? "tuemail@correo.com" : "you@email.com"}
+                  buttonLabel="Join waitlist"
+                  emailPlaceholder="you@email.com"
                   className="max-w-md"
                 />
                 <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm text-muted-foreground sm:mt-6 lg:justify-start">
@@ -177,7 +101,7 @@ export default function Home() {
                       ))}
                     </span>
                     <strong className="font-medium text-foreground">{socialProofCount.toLocaleString()}</strong>{" "}
-                    {t.socialProof}
+                    people joined
                   </span>
                 </div>
               </div>
@@ -190,7 +114,7 @@ export default function Home() {
                   className="absolute inset-0 h-full w-full object-cover object-[center_72%] sm:object-[center_68%] lg:object-center"
                 />
                 <div className="pointer-events-none absolute inset-x-0 bottom-16 space-y-1.5 p-3 lg:bottom-16">
-                  {t.mockupMessages.map((message, index) => {
+                  {mockupMessages.map((message, index) => {
                     return (
                       <div
                         key={index}

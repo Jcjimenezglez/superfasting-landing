@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { ArrowRight, Loader2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -12,18 +13,17 @@ interface WaitlistFormProps {
   className?: string
   emailPlaceholder?: string
   inputClassName?: string
-  lang?: "es" | "en"
 }
 
 type StatusType = "idle" | "success" | "error"
 
 export function WaitlistForm({
-  buttonLabel = "Entrar al waitlist",
+  buttonLabel = "Join waitlist",
   className = "",
-  emailPlaceholder = "tuemail@correo.com",
+  emailPlaceholder = "you@email.com",
   inputClassName,
-  lang = "es",
 }: WaitlistFormProps) {
+  const router = useRouter()
   const [email, setEmail] = useState("")
   const [status, setStatus] = useState<StatusType>("idle")
   const [message, setMessage] = useState("")
@@ -39,35 +39,24 @@ export function WaitlistForm({
       const response = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, lang }),
+        body: JSON.stringify({ email }),
       })
 
       const data = (await response.json().catch(() => ({}))) as { ok?: boolean; message?: string }
 
       if (!response.ok || !data.ok) {
         setStatus("error")
-        setMessage(
-          data.message ??
-            (lang === "es"
-              ? "No se pudo guardar tu correo. Intenta de nuevo."
-              : "We could not save your email. Please try again.")
-        )
+        setMessage(data.message ?? "We could not save your email. Please try again.")
         return
       }
 
       setStatus("success")
-      setMessage(
-        data.message ?? (lang === "es" ? "Listo, te avisamos cuando abramos." : "Done. We will notify you soon.")
-      )
       setEmail("")
+      router.push("/thanks")
     } catch (error) {
       console.error("waitlist_submit_failed", error)
       setStatus("error")
-      setMessage(
-        lang === "es"
-          ? "Error de conexion. Intenta de nuevo en unos segundos."
-          : "Connection error. Please try again in a few seconds."
-      )
+      setMessage("Connection error. Please try again in a few seconds.")
     } finally {
       setIsSubmitting(false)
     }
@@ -98,7 +87,7 @@ export function WaitlistForm({
         <Button className="h-11 shrink-0 rounded-none border-0 border-l border-input/50 px-5 hover:bg-primary/95" disabled={isSubmitting} type="submit">
           {isSubmitting ? (
             <>
-              {lang === "es" ? "Guardando" : "Saving"} <Loader2 className="animate-spin" />
+              Saving <Loader2 className="animate-spin" />
             </>
           ) : (
             <>
@@ -119,4 +108,3 @@ export function WaitlistForm({
     </div>
   )
 }
-

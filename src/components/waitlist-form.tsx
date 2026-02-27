@@ -77,7 +77,7 @@ export function WaitlistForm({
     <div className={className}>
       <form
         className={cn(
-          "flex overflow-hidden rounded-md border border-input bg-transparent transition-colors",
+          "flex overflow-hidden rounded-[100px] border border-input bg-transparent transition-colors",
           "focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50 focus-within:ring-offset-0"
         )}
         onSubmit={onSubmit}

@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Image from "next/image"
 import Link from "next/link"
 
 import {
@@ -12,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Logo } from "@/components/logo"
 import { WaitlistForm } from "@/components/waitlist-form"
-import { ChevronDown, Users } from "lucide-react"
+import { ChevronDown } from "lucide-react"
 
 type Locale = "es" | "en"
 type MockupMessage = {
@@ -78,6 +77,15 @@ function randomIncrement() {
   return Math.floor(Math.random() * 5) + 1
 }
 
+const socialProofAvatars = [
+  { src: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=80&h=80&q=80", alt: "Waitlist user avatar 1" },
+  { src: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=80&h=80&q=80", alt: "Waitlist user avatar 2" },
+  { src: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&h=80&q=80", alt: "Waitlist user avatar 3" },
+  { src: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=80&h=80&q=80", alt: "Waitlist user avatar 4" },
+  { src: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=80&h=80&q=80", alt: "Waitlist user avatar 5" },
+  { src: "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?auto=format&fit=crop&w=80&h=80&q=80", alt: "Waitlist user avatar 6" },
+] as const
+
 export default function Home() {
   const [lang, setLang] = useState<Locale>("en")
   const [socialProofCount, setSocialProofCount] = useState(SOCIAL_PROOF_BASE)
@@ -110,7 +118,7 @@ export default function Home() {
       <header className="shrink-0 border-b border-border/40 bg-background/80 backdrop-blur-sm">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:h-16 sm:px-6 lg:px-0">
           <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight" style={{ fontFamily: "var(--font-poppins)" }}>
-            <Logo size={28} className="text-black" />
+            <Logo size={28} className="text-primary" />
             <span>Superfasting</span>
           </Link>
           <div className="flex items-center gap-2">
@@ -131,10 +139,10 @@ export default function Home() {
         </div>
       </header>
 
-      <main id="main-content" className="flex min-h-0 flex-1 flex-col items-center justify-start px-4 py-6 sm:px-6 sm:py-8 lg:justify-center lg:py-6">
+      <main id="main-content" className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 py-6 sm:px-6 sm:py-8 lg:py-6">
         <div className="mx-auto w-full max-w-5xl">
-          <section className="grid items-center justify-items-center gap-6 sm:gap-8 lg:items-center lg:justify-items-start lg:gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(300px,440px)]">
-            <div className="w-full max-w-xl space-y-3 text-center sm:space-y-5 sm:text-center lg:max-w-none lg:text-left">
+          <section className="grid items-center justify-items-center gap-6 sm:gap-8 lg:gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(300px,440px)]">
+            <div className="w-full max-w-xl space-y-3 text-center sm:space-y-5 lg:text-left">
               <h1
                 className="mx-auto max-w-[13ch] font-bold leading-[1.15] tracking-tight text-[clamp(2.35rem,8vw+1.2rem,3.5rem)] sm:text-[clamp(2.75rem,9vw+1.5rem,4.5rem)] lg:mx-0 lg:text-[clamp(2.5rem,5vw+0.75rem,5.25rem)]"
                 style={{
@@ -142,7 +150,7 @@ export default function Home() {
                 }}
               >
                 {t.heroTitleBefore}
-                <span className="bg-gradient-to-br from-[#0A83B2] to-[#18A193] bg-clip-text text-transparent">
+                <span className="text-primary">
                   {t.heroTitleHighlight}
                 </span>
               </h1>
@@ -157,26 +165,31 @@ export default function Home() {
                   className="max-w-md"
                 />
                 <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm text-muted-foreground sm:mt-6 lg:justify-start">
-                  <span className="flex items-center gap-2">
-                    <Users className="size-4 shrink-0" />
+                  <span className="flex items-center gap-2.5">
+                    <span className="flex items-center">
+                      {socialProofAvatars.map((avatar, index) => (
+                        <span
+                          key={avatar.src}
+                          className={`inline-flex size-6 overflow-hidden rounded-full border border-background ${index === 0 ? "" : "-ml-1.5"}`}
+                        >
+                          <img src={avatar.src} alt={avatar.alt} width={24} height={24} className="size-6 object-cover" loading="lazy" />
+                        </span>
+                      ))}
+                    </span>
                     <strong className="font-medium text-foreground">{socialProofCount.toLocaleString()}</strong>{" "}
                     {t.socialProof}
                   </span>
-                  <span className="text-muted-foreground/90">{t.timing}</span>
                 </div>
               </div>
             </div>
-            <div className="mx-auto w-full max-w-[440px] lg:mx-0">
-              <div className="relative mx-auto aspect-[780/1688] w-[min(75vw,300px)] min-h-[450px] lg:w-auto lg:h-[74.25vh] lg:min-h-0 overflow-hidden rounded-[2rem] border border-foreground/10 bg-card shadow-md">
-                <Image
+            <div className="mx-auto w-full max-w-[440px]">
+              <div className="relative mx-auto aspect-[780/1688] w-[min(75vw,300px)] min-h-[450px] overflow-hidden rounded-[2rem] border border-foreground/10 bg-card shadow-md">
+                <img
                   src="/hero-mobile-chat-v2.png"
                   alt="Telegram mobile mockup with fasting assistant"
-                  fill
-                  sizes="(min-width: 1024px) 26vw, 300px"
-                  className="object-cover object-top lg:object-center"
-                  priority
+                  className="absolute inset-0 h-full w-full object-cover object-[center_72%] sm:object-[center_68%] lg:object-center"
                 />
-                <div className="pointer-events-none absolute inset-x-0 bottom-16 space-y-1.5 p-3">
+                <div className="pointer-events-none absolute inset-x-0 bottom-16 space-y-1.5 p-3 lg:bottom-16">
                   {t.mockupMessages.map((message, index) => {
                     return (
                       <div
@@ -211,11 +224,6 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="shrink-0 border-t border-border/40 py-4 sm:py-6">
-        <div className="mx-auto max-w-5xl px-4 text-center text-sm text-muted-foreground sm:px-6">
-          {t.footer}
-        </div>
-      </footer>
     </div>
   )
 }

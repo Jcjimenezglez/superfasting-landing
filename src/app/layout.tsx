@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Bebas_Neue, Nunito, Poppins } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 
 const bebasNeue = Bebas_Neue({
@@ -35,20 +34,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=AW-17981379200"
-          strategy="afterInteractive"
-        />
-        <Script id="google-ads-gtag" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'AW-17981379200');
-          `}
-        </Script>
-      </head>
       <body className={`${bebasNeue.variable} ${nunito.variable} ${poppins.variable} font-sans antialiased`}>
         {children}
       </body>

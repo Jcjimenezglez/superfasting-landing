@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { ArrowRight, Loader2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -17,6 +17,35 @@ interface WaitlistFormProps {
 
 type StatusType = "idle" | "success" | "error"
 
+interface WaitlistAttributionPayload {
+  utmSource?: string
+  utmMedium?: string
+  utmCampaign?: string
+  utmTerm?: string
+  utmContent?: string
+  gclid?: string
+}
+
+function readAttribution(searchParams: URLSearchParams): WaitlistAttributionPayload {
+  const attribution: WaitlistAttributionPayload = {}
+
+  const utmSource = searchParams.get("utm_source")
+  const utmMedium = searchParams.get("utm_medium")
+  const utmCampaign = searchParams.get("utm_campaign")
+  const utmTerm = searchParams.get("utm_term")
+  const utmContent = searchParams.get("utm_content")
+  const gclid = searchParams.get("gclid")
+
+  if (utmSource) attribution.utmSource = utmSource
+  if (utmMedium) attribution.utmMedium = utmMedium
+  if (utmCampaign) attribution.utmCampaign = utmCampaign
+  if (utmTerm) attribution.utmTerm = utmTerm
+  if (utmContent) attribution.utmContent = utmContent
+  if (gclid) attribution.gclid = gclid
+
+  return attribution
+}
+
 export function WaitlistForm({
   buttonLabel = "Join waitlist",
   className = "",
@@ -24,6 +53,7 @@ export function WaitlistForm({
   inputClassName,
 }: WaitlistFormProps) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState("")
   const [status, setStatus] = useState<StatusType>("idle")
   const [message, setMessage] = useState("")
@@ -36,10 +66,12 @@ export function WaitlistForm({
     setIsSubmitting(true)
 
     try {
+      const attribution = readAttribution(searchParams)
+
       const response = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, attribution }),
       })
 
       const data = (await response.json().catch(() => ({}))) as { ok?: boolean; message?: string }

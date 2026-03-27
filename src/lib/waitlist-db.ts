@@ -55,7 +55,7 @@ async function ensureWaitlistTable(): Promise<void> {
     tableReadyPromise = (async () => {
       const db = getPool()
       await db.query(`
-        create table if not exists waitlist_emails (
+        create table if not exists public.waitlist_emails (
           id bigint generated always as identity primary key,
           email text not null unique,
           source text not null default 'superfasting.live',
@@ -66,6 +66,8 @@ async function ensureWaitlistTable(): Promise<void> {
           updated_at timestamptz not null default now(),
           check (position('@' in email) > 1)
         );
+
+        alter table if exists public.waitlist_emails enable row level security;
       `)
     })()
   }
@@ -81,13 +83,13 @@ export async function insertWaitlistEmail(input: WaitlistInsertInput): Promise<W
 
   const result = await db.query<{ created: boolean }>(
     `
-      insert into waitlist_emails (email, source, metadata)
+      insert into public.waitlist_emails (email, source, metadata)
       values ($1, $2, $3::jsonb)
       on conflict (email)
       do update
       set
         source = excluded.source,
-        metadata = waitlist_emails.metadata || excluded.metadata,
+        metadata = public.waitlist_emails.metadata || excluded.metadata,
         updated_at = now()
       returning (xmax = 0) as created;
     `,

@@ -4,8 +4,39 @@ import { insertWaitlistEmail } from "@/lib/waitlist-db"
 
 export const runtime = "nodejs"
 
+interface WaitlistAttributionPayload {
+  utmSource?: string
+  utmMedium?: string
+  utmCampaign?: string
+  utmTerm?: string
+  utmContent?: string
+  gclid?: string
+}
+
 function isValidEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+}
+
+function sanitizeOptionalString(value: unknown, maxLength = 256): string | undefined {
+  if (typeof value !== "string") return undefined
+  const trimmedValue = value.trim()
+  if (!trimmedValue) return undefined
+  return trimmedValue.slice(0, maxLength)
+}
+
+function parseAttribution(rawValue: unknown): WaitlistAttributionPayload {
+  if (!rawValue || typeof rawValue !== "object" || Array.isArray(rawValue)) {
+    return {}
+  }
+
+  return {
+    utmSource: sanitizeOptionalString((rawValue as Record<string, unknown>).utmSource),
+    utmMedium: sanitizeOptionalString((rawValue as Record<string, unknown>).utmMedium),
+    utmCampaign: sanitizeOptionalString((rawValue as Record<string, unknown>).utmCampaign),
+    utmTerm: sanitizeOptionalString((rawValue as Record<string, unknown>).utmTerm),
+    utmContent: sanitizeOptionalString((rawValue as Record<string, unknown>).utmContent),
+    gclid: sanitizeOptionalString((rawValue as Record<string, unknown>).gclid),
+  }
 }
 
 const messages = {
@@ -20,6 +51,7 @@ export async function POST(request: Request) {
     const body = await request.json().catch(() => ({}))
     const rawEmail = typeof body.email === "string" ? body.email : ""
     const email = rawEmail.trim().toLowerCase()
+    const attribution = parseAttribution(body.attribution)
 
     if (!email || !isValidEmail(email)) {
       return NextResponse.json(
@@ -34,6 +66,7 @@ export async function POST(request: Request) {
       metadata: {
         userAgent: request.headers.get("user-agent"),
         language: request.headers.get("accept-language"),
+        attribution,
       },
     })
 

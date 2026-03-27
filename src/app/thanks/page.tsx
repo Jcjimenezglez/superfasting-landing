@@ -1,30 +1,8 @@
-"use client"
-
-import { useEffect } from "react"
 import Link from "next/link"
 import { CheckCircle2 } from "lucide-react"
 import { Logo } from "@/components/logo"
 
-const GOOGLE_ADS_ID = "AW-17981379200"
-const THANKS_CONVERSION_FIRED_KEY = "superfasting_thanks_conversion_fired"
-
 export default function ThanksPage() {
-  useEffect(() => {
-    if (typeof window === "undefined") return
-
-    // Prevent duplicate conversion events on refreshes in same session.
-    if (sessionStorage.getItem(THANKS_CONVERSION_FIRED_KEY) === "1") return
-
-    const gtag = (window as Window & {
-      gtag?: (...args: unknown[]) => void
-    }).gtag
-
-    if (!gtag) return
-
-    gtag("event", "conversion", { send_to: GOOGLE_ADS_ID })
-    sessionStorage.setItem(THANKS_CONVERSION_FIRED_KEY, "1")
-  }, [])
-
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="shrink-0 border-b border-border/40 bg-background/80 backdrop-blur-sm">

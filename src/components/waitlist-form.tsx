@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { Suspense, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { ArrowRight, Loader2 } from "lucide-react"
 
@@ -46,7 +46,21 @@ function readAttribution(searchParams: URLSearchParams): WaitlistAttributionPayl
   return attribution
 }
 
-export function WaitlistForm({
+function WaitlistFormFallback({ className }: { className?: string }) {
+  return (
+    <div className={className}>
+      <div
+        className={cn(
+          "flex h-11 overflow-hidden rounded-[100px] border border-input bg-muted/25",
+          "animate-pulse"
+        )}
+        aria-hidden
+      />
+    </div>
+  )
+}
+
+function WaitlistFormInner({
   buttonLabel = "Join waitlist",
   className = "",
   emailPlaceholder = "you@email.com",
@@ -138,5 +152,13 @@ export function WaitlistForm({
         </p>
       ) : null}
     </div>
+  )
+}
+
+export function WaitlistForm(props: WaitlistFormProps) {
+  return (
+    <Suspense fallback={<WaitlistFormFallback className={props.className} />}>
+      <WaitlistFormInner {...props} />
+    </Suspense>
   )
 }
